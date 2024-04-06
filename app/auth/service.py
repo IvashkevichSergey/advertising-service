@@ -4,13 +4,12 @@ from datetime import timedelta, datetime, timezone
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 import jwt
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-
 from app.config import settings
-from app.database import get_session
 from app.users.models import User
-from app.users.service import get_user_by_username
+from app.users.repository import UserRepository, pwd_context
+from app.users.schemas import UserCreate
+from app.users.service import get_user_repo
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -32,8 +31,8 @@ def generate_access_token(username: str, token_expires_delta: Optional[int] = 30
     return token
 
 
-async def check_user_auth(session: AsyncSession = Depends(get_session),
-                          token: str = Depends(oauth2_scheme)) -> User:
+async def check_token(token: str = Depends(oauth2_scheme)) -> str:
+    """Check if the token is correct and contains a username string"""
     try:
         payload = jwt.decode(jwt=token, key=settings.SECRET_JWT_KEY, algorithms=[ALGORYTHM])
         username = payload.get("sub")
@@ -47,9 +46,23 @@ async def check_user_auth(session: AsyncSession = Depends(get_session),
     if not username:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Username or password not valid")
-    user = await get_user_by_username(session, username)
+    return username
+
+
+async def check_user_auth(repo: UserRepository = Depends(get_user_repo),
+                          username: str = Depends(check_token)) -> User:
+    """Check if user authenticated"""
+    user = await repo.read(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Username or password not valid")
     return user
 
+
+async def auth_user(user_data: UserCreate,
+                    repo: UserRepository = Depends(get_user_repo)) -> Optional[User]:
+    """Check if the user exists and the password are correct"""
+    user = await repo.read(user_data.username)
+    if not (user and pwd_context.verify(user_data.password, user.password)):
+        return None
+    return user

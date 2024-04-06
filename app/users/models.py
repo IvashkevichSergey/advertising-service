@@ -22,7 +22,8 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     advertisements: Mapped[list["Adv"]] = relationship("Adv",
-                                                back_populates="author")
+                                                       back_populates="author",
+                                                       passive_deletes=True)
 
     def __repr__(self) -> str:
         return f"User(id={self.id}, username={self.username}, role={self.role})"

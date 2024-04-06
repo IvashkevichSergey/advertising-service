@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.adv.schemas import AdvBase
-from app.users.models import Roles
 
 
 class UserCreate(BaseModel):
