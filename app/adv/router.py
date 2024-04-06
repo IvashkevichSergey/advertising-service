@@ -1,19 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-
 from app import User
 from app.adv.repository import AdvRepository
 from app.adv.schemas import AdvBase, AdvCreate, AdvUpdate
+from app.adv.service import get_adv_repo
 from app.auth.service import check_user_auth
-from app.database import get_session
+from app.comments.router import comment_router
 
 adv_router = APIRouter(prefix="/adv")
-
-
-async def get_adv_repo(session: AsyncSession = Depends(get_session)) -> AdvRepository:
-    return AdvRepository(session)
+adv_router.include_router(comment_router)
 
 
 @adv_router.get('/', response_model=list[AdvBase])

@@ -1,7 +1,7 @@
 import enum
-
 from sqlalchemy import BigInteger, Enum, Boolean, String, ForeignKey, Integer
-from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.comments.models import Comment
 from app.database import Base
 from app.users.models import User
 
@@ -22,6 +22,7 @@ class Adv(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     author: Mapped[User] = relationship("User", lazy="selectin", back_populates="advertisements")
+    comments: Mapped[Comment] = relationship("Comment", lazy="selectin", back_populates="adv")
 
     def __repr__(self) -> str:
         return f"Adv(id={self.id}, title={self.title}, author={self.author.username})"
