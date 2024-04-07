@@ -21,7 +21,9 @@ async def get_comment_repo(session: AsyncSession = Depends(get_session)) -> Comm
     return CommentRepository(session)
 
 
-@comment_router.get('/{adv_id}/comments', response_model=list[CommentBase] | None)
+@comment_router.get('/{adv_id}/comments',
+                    summary="Get all comments of {adv_id} advertisement",
+                    response_model=list[CommentBase] | None)
 async def get_comments(adv_id: int,
                        repo: CommentRepository = Depends(get_comment_repo)):
     """Router for getting all comments of any advertisement"""
@@ -29,7 +31,10 @@ async def get_comments(adv_id: int,
     return comments
 
 
-@comment_router.post('/{adv_id}/comments', response_model=list[CommentBase])
+@comment_router.post('/{adv_id}/comments',
+                     summary="Create new comment for {adv_id} advertisement",
+                     status_code=status.HTTP_201_CREATED,
+                     response_model=list[CommentBase])
 async def create_comment(comment_data: CommentCreate,
                          adv_id: int,
                          repo: CommentRepository = Depends(get_comment_repo),
@@ -50,7 +55,9 @@ async def create_comment(comment_data: CommentCreate,
         await repo.session.rollback()
 
 
-@comment_router.put('/{adv_id}/comments/{comment_id}', response_model=list[CommentBase])
+@comment_router.put('/{adv_id}/comments/{comment_id}',
+                    summary="Update comment with {comment_id} of {adv_id} advertisement",
+                    response_model=list[CommentBase])
 async def update_comments(adv_id: int,
                           comment_id: int,
                           comment_data: CommentCreate,
@@ -73,7 +80,9 @@ async def update_comments(adv_id: int,
     return comments
 
 
-@comment_router.delete('/{adv_id}/comments/{comment_id}')
+@comment_router.delete('/{adv_id}/comments/{comment_id}',
+                       summary="Delete comment with {comment_id} of {adv_id} advertisement",
+                       )
 async def delete_comment(adv_id: int,
                          comment_id: int,
                          repo: CommentRepository = Depends(get_comment_repo),
@@ -95,6 +104,7 @@ async def delete_comment(adv_id: int,
 
 
 @comment_router.delete('/del_comments/{adv_group}',
+                       summary="Delete all comments of {adv_group} advertisements - only for ADMIN",
                        dependencies=[Depends(PermissionChecker([Roles.ADMIN_ROLE]))])
 async def delete_comments(adv_group: Group,
                          repo: CommentRepository = Depends(get_comment_repo)):

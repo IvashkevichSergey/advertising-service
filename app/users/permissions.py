@@ -20,7 +20,19 @@ class PermissionChecker:
 
 
 def check_owner_or_admin(item_instance: Adv | Comment, user_instance: User) -> bool:
-    """Check user permission to get access to some methods (e.g. put, delete)"""
+    """Check user permission to get access to some methods (e.g. put, delete)
+    Parameters
+    ----------
+    item_instance :
+        An instance of Adv or Comment class
+    user_instance :
+        A current user instance, whose role need to be checked
+
+    Returns
+    -------
+    bool :
+        True if user has rights, False otherwise
+    """
     if (item_instance.author_id == user_instance.id) \
             or (user_instance.role == Roles.ADMIN_ROLE):
         return True

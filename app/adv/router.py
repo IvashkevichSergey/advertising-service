@@ -13,13 +13,17 @@ adv_router = APIRouter(prefix="/adv")
 adv_router.include_router(comment_router)
 
 
-@adv_router.get('/', response_model=list[AdvBase])
+@adv_router.get('/',
+                summary="Get all advertisements",
+                response_model=list[AdvBase])
 async def get_advs(repo: AdvRepository = Depends(get_adv_repo)):
     """Router for getting all advertisements"""
     return await repo.read_all()
 
 
-@adv_router.get('/{adv_id}', response_model=AdvBase)
+@adv_router.get('/{adv_id}',
+                summary="Get {adv_id} advertisement",
+                response_model=AdvBase)
 async def get_advs(adv_id: int,
                    repo: AdvRepository = Depends(get_adv_repo)):
     """Router for getting all advertisements"""
@@ -30,7 +34,10 @@ async def get_advs(adv_id: int,
     return adv
 
 
-@adv_router.post('/', response_model=AdvBase)
+@adv_router.post('/',
+                 summary="Create new advertisement",
+                 status_code=status.HTTP_201_CREATED,
+                 response_model=AdvBase)
 async def create_adv(adv_data: AdvCreate,
                      repo: AdvRepository = Depends(get_adv_repo),
                      current_user: User = Depends(check_user_auth)):
@@ -44,7 +51,9 @@ async def create_adv(adv_data: AdvCreate,
         await repo.session.rollback()
 
 
-@adv_router.put('/{adv_id}', response_model=AdvBase)
+@adv_router.put('/{adv_id}',
+                summary="Update {adv_id} advertisement",
+                response_model=AdvBase)
 async def update_adv(adv_id: int,
                      adv_data: AdvUpdate,
                      repo: AdvRepository = Depends(get_adv_repo),
@@ -59,7 +68,8 @@ async def update_adv(adv_id: int,
     return await repo.update(adv_data, adv)
 
 
-@adv_router.delete('/{adv_id}')
+@adv_router.delete('/{adv_id}',
+                   summary="Delete {adv_id} advertisement")
 async def delete_adv(adv_id: int,
                      repo: AdvRepository = Depends(get_adv_repo),
                      current_user: User = Depends(check_user_auth)):

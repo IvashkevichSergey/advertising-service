@@ -4,6 +4,7 @@ from app.database import Base
 
 
 class Comment(Base):
+    """Comment database model"""
     __tablename__ = "comment"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     body: Mapped[str] = mapped_column(String(500))

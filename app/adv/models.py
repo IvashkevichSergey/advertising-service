@@ -7,12 +7,14 @@ from app.users.models import User
 
 
 class Group(str, enum.Enum):
+    """List of available adv groups"""
     SELLING_ADV = "SELL"
     BUYING_ADV = "BUY"
     SERVICE_ADV = "SERVICE"
 
 
 class Adv(Base):
+    """Advertisements database model"""
     __tablename__ = "advertisement"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(50))

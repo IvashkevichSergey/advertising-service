@@ -11,7 +11,9 @@ from app.users.service import get_user_repo
 user_router = APIRouter(prefix="/users")
 
 
-@user_router.get('/me', response_model=UserBase)
+@user_router.get('/me',
+                 summary="Get authorized User profile info",
+                 response_model=UserBase)
 async def get_user(repo: UserRepository = Depends(get_user_repo),
                    current_user: User = Depends(check_user_auth)):
     """Router for getting current user profile information"""
@@ -19,7 +21,9 @@ async def get_user(repo: UserRepository = Depends(get_user_repo),
     return res
 
 
-@user_router.put('/me', response_model=UserBase)
+@user_router.put('/me',
+                 summary="Change authorized User profile info",
+                 response_model=UserBase)
 async def change_user(user_data: UserUpdate,
                       repo: UserRepository = Depends(get_user_repo),
                       current_user: User = Depends(check_user_auth)):
@@ -27,7 +31,9 @@ async def change_user(user_data: UserUpdate,
     return await repo.update(user_data, current_user)
 
 
-@user_router.delete('/me')
+@user_router.delete('/me',
+                    summary="Delete authorized User",
+                    )
 async def delete_user(repo: UserRepository = Depends(get_user_repo),
                       current_user: User = Depends(check_user_auth)):
     """Router for deleting current user"""
@@ -36,6 +42,7 @@ async def delete_user(repo: UserRepository = Depends(get_user_repo),
 
 
 @user_router.get('/list',
+                 summary="Get list of all Users",
                  dependencies=[Depends(PermissionChecker([Roles.ADMIN_ROLE]))],
                  response_model=list[UserFullInfo])
 async def get_all_users(repo: UserRepository = Depends(get_user_repo)):
@@ -44,6 +51,7 @@ async def get_all_users(repo: UserRepository = Depends(get_user_repo)):
 
 
 @user_router.post('/change',
+                  summary="Update restricted Users' data - only for ADMIN",
                   dependencies=[Depends(PermissionChecker([Roles.ADMIN_ROLE]))],
                   response_model=UserFullInfo)
 async def change_users_restricted_data(user_data: UserUpdateAdmin,

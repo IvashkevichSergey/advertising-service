@@ -10,7 +10,9 @@ from app.users.service import get_user_repo
 auth_router = APIRouter(prefix="/auth")
 
 
-@auth_router.post('/register/', status_code=status.HTTP_201_CREATED)
+@auth_router.post('/register/',
+                  summary="Sign up endpoint",
+                  status_code=status.HTTP_201_CREATED)
 async def register_user(user_data: UserCreate,
                         repo: UserRepository = Depends(get_user_repo)):
     """Router for users sign up"""
@@ -27,12 +29,17 @@ async def register_user(user_data: UserCreate,
         await repo.session.rollback()
 
 
-@auth_router.post('/login/', response_model=Token)
+@auth_router.post('/login/',
+                  summary="Login endpoint",
+                  response_model=Token)
 async def login_user(user_data: UserCreate,
                      repo: UserRepository = Depends(get_user_repo)):
     user = await auth_user(user_data, repo)
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Invalid username or password")
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Your account is temporarily blocked")
     access_token = generate_access_token(user.username)
     return Token(access_token=access_token)

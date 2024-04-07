@@ -9,13 +9,26 @@ from app.users.repository import UserRepository, pwd_context
 from app.users.schemas import UserCreate
 from app.users.service import get_user_repo
 
+# Instance of security class to work with tokens
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-
+# Algorythm that used for encode/decode tokens
 ALGORYTHM = "HS256"
 
 
 def generate_access_token(username: str, token_expires_delta: int | None = 600) -> str:
-    """Service function to generate access token. Default token lifetime is 30 minutes"""
+    """Service function to generate access token
+    Parameters
+    ----------
+    username :
+        Username that encodes with 'sub' key
+    token_expires_delta :
+        Token lifetime, default is 30 minutes
+
+    Returns
+    -------
+    str :
+        A generated token
+    """
     expires_time = datetime.now(timezone.utc) + timedelta(minutes=token_expires_delta)
     data_to_encode = {
         "sub": username,
@@ -30,7 +43,17 @@ def generate_access_token(username: str, token_expires_delta: int | None = 600) 
 
 
 async def check_token(token: str = Depends(oauth2_scheme)) -> str:
-    """Check if the token is correct and contains a username string"""
+    """Check if the token is correct and contains a username string
+    Parameters
+    ----------
+    token :
+        A generated token
+
+    Returns
+    -------
+    str :
+        A decoded username from token's 'sub' key
+    """
     try:
         payload = jwt.decode(jwt=token, key=settings.SECRET_JWT_KEY, algorithms=[ALGORYTHM])
         username = payload.get("sub")
@@ -49,7 +72,19 @@ async def check_token(token: str = Depends(oauth2_scheme)) -> str:
 
 async def check_user_auth(repo: UserRepository = Depends(get_user_repo),
                           username: str = Depends(check_token)) -> User:
-    """Check if user authenticated"""
+    """Check if user authenticated
+    Parameters
+    ----------
+    repo :
+        UserRepository class with User CRUD operations'
+    username :
+        A decoded username from token's 'sub' key
+
+    Returns
+    -------
+    User :
+        A User's class instance
+    """
     user = await repo.read(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
@@ -59,7 +94,20 @@ async def check_user_auth(repo: UserRepository = Depends(get_user_repo),
 
 async def auth_user(user_data: UserCreate,
                     repo: UserRepository = Depends(get_user_repo)) -> User | None:
-    """Check if the user exists and the password are correct"""
+    """Check if the user exists and the password are correct
+    Parameters
+    ----------
+
+    user_data :
+        Data of pydantic class UserCreate to get User's username and password
+    repo :
+        UserRepository class with User CRUD operations'
+
+    Returns
+    -------
+    User :
+        A User's class instance
+    """
     user = await repo.read(user_data.username)
     if not (user and pwd_context.verify(user_data.password, user.password)):
         return None

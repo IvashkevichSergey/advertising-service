@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    """Settings class for using environment variables from dotenv file"""
     DB_HOST: str
     DB_PORT: str
     DB_USER: str
@@ -11,7 +12,12 @@ class Settings(BaseSettings):
 
     @property
     def async_database_url(self):
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+asyncpg://" \
+               f"{self.DB_USER}:" \
+               f"{self.DB_PASS}@" \
+               f"{self.DB_HOST}:" \
+               f"{self.DB_PORT}/" \
+               f"{self.DB_NAME}"
 
     class Config:
         env_file = ".env"

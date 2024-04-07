@@ -1,17 +1,18 @@
 import enum
-
 from sqlalchemy import BigInteger, Enum, Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 
 class Roles(str, enum.Enum):
+    """List of available user roles"""
     USER_ROLE = "USER"
     ADMIN_ROLE = "ADMIN"
     MODERATOR_ROLE = "MODERATOR"
 
 
 class User(Base):
+    """User database model"""
     __tablename__ = "user"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
     username: Mapped[str] = mapped_column(String(25), unique=True)
