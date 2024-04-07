@@ -29,4 +29,4 @@ app.include_router(user_router, tags=["User"])
 app.include_router(adv_router, tags=["Advertisement and Comment"])
 
 if __name__ == "__main__":
-    uvicorn.run(app="main:app", reload=True)
+    uvicorn.run(app="main:app", reload=True, port=8001)
