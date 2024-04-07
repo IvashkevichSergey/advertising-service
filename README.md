@@ -35,8 +35,7 @@ endpoint with body request:
     <br>"password": "123"
 <br>}
 </blockquote>
-<code>To sign up with ADMIN role just uncomment <i>role</i> field in 
-<i>app/auth/router.py</i> file</code>>
+<code>To sign up with ADMIN role just uncomment <i>role</i> field in <i>app/auth/router.py</i> file</code>
 
 Then go to <code>/auth/login</code> endpoint to get access token with the same body request:
 <blockquote>{
