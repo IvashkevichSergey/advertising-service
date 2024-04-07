@@ -10,7 +10,7 @@ from app.users.service import get_user_repo
 auth_router = APIRouter(prefix="/auth")
 
 
-@auth_router.post('/register/',
+@auth_router.post('/register',
                   summary="Sign up endpoint",
                   status_code=status.HTTP_201_CREATED)
 async def register_user(user_data: UserCreate,
@@ -29,7 +29,7 @@ async def register_user(user_data: UserCreate,
         await repo.session.rollback()
 
 
-@auth_router.post('/login/',
+@auth_router.post('/login',
                   summary="Login endpoint",
                   response_model=Token)
 async def login_user(user_data: UserCreate,

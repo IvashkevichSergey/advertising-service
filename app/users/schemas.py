@@ -7,6 +7,7 @@ class UserCreate(BaseModel):
     """Model to CREATE user"""
     username: str = Field(min_length=3, max_length=25)
     password: str = Field(min_length=3)
+    # role: Roles = Roles.ADMIN_ROLE
 
 
 class UserBase(BaseModel):
