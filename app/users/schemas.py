@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.adv.schemas import AdvBase
+from app.users.models import Roles
 
 
 class UserCreate(BaseModel):
@@ -22,3 +23,15 @@ class UserUpdate(BaseModel):
     password: str = Field(min_length=3, default=None)
     fullname: str = Field(default=None)
     email: EmailStr = Field(default=None)
+
+
+class UserFullInfo(UserBase):
+    id: int
+    role: Roles
+    is_active: bool
+
+
+class UserUpdateAdmin(BaseModel):
+    username: str
+    role: Roles = Field(default=None)
+    is_active: bool = Field(default=None)

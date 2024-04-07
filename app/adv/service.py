@@ -5,4 +5,5 @@ from app.database import get_session
 
 
 async def get_adv_repo(session: AsyncSession = Depends(get_session)) -> AdvRepository:
+    """Service function to return class with Adv CRUD operations"""
     return AdvRepository(session)

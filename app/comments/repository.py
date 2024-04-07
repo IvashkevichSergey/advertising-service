@@ -1,7 +1,10 @@
 from typing import Sequence
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, join as sql_join
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+
+from app.adv.models import Group, Adv
 from app.comments.models import Comment
 from app.comments.schemas import CommentCreate
 
@@ -42,9 +45,19 @@ class CommentRepository:
         await self.session.commit()
         return comment_instance
 
-    async def delete(self, comment_id: int):
+    async def delete(self, comment_id: int) -> Comment:
         """Delete a Comment instance"""
         query = delete(Comment).where(Comment.id == comment_id).returning(Comment)
         comment_instance = await self.session.execute(query)
         await self.session.commit()
         return comment_instance.scalar()
+
+    async def delete_group(self, adv_group: Group) -> int:
+        """Delete all Comment from specific Adv Group"""
+        subquery = select(Adv.id).where(Adv.group == adv_group)
+        query = delete(Comment). \
+            where(Comment.adv_id.in_(subquery)). \
+            returning(Comment)
+        comment_instances = await self.session.execute(query)
+        await self.session.commit()
+        return len(comment_instances.scalars().all())

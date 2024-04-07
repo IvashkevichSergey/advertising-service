@@ -4,7 +4,7 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from app import User
-from app.users.schemas import UserCreate, UserUpdate
+from app.users.schemas import UserCreate, UserUpdate, UserUpdateAdmin
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
@@ -52,3 +52,15 @@ class UserRepository:
         user = await self.session.execute(query)
         await self.session.commit()
         return user.scalar()
+
+    async def update_restricted(self,
+                                user_data: UserUpdateAdmin,
+                                user_instance: User) -> User:
+        """Method to Update restricted User data (e.g. User role and status)"""
+        query = update(User). \
+            where(User.id == user_instance.id). \
+            values(**user_data.model_dump(exclude_unset=True))
+        await self.session.execute(query)
+        await self.session.refresh(user_instance)
+        await self.session.commit()
+        return user_instance

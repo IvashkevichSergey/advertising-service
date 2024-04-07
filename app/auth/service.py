@@ -1,6 +1,4 @@
-from typing import Optional
 from datetime import timedelta, datetime, timezone
-
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 import jwt
@@ -16,7 +14,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 ALGORYTHM = "HS256"
 
 
-def generate_access_token(username: str, token_expires_delta: Optional[int] = 30) -> str:
+def generate_access_token(username: str, token_expires_delta: int | None = 600) -> str:
     """Service function to generate access token. Default token lifetime is 30 minutes"""
     expires_time = datetime.now(timezone.utc) + timedelta(minutes=token_expires_delta)
     data_to_encode = {
@@ -60,7 +58,7 @@ async def check_user_auth(repo: UserRepository = Depends(get_user_repo),
 
 
 async def auth_user(user_data: UserCreate,
-                    repo: UserRepository = Depends(get_user_repo)) -> Optional[User]:
+                    repo: UserRepository = Depends(get_user_repo)) -> User | None:
     """Check if the user exists and the password are correct"""
     user = await repo.read(user_data.username)
     if not (user and pwd_context.verify(user_data.password, user.password)):

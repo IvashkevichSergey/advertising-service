@@ -1,7 +1,6 @@
 from typing import Sequence
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from app import Adv
 from app.adv.schemas import AdvCreate, AdvUpdate
 
