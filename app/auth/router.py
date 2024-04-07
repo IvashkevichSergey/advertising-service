@@ -1,4 +1,6 @@
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from starlette import status
 from app.auth.schemas import Token
@@ -32,9 +34,13 @@ async def register_user(user_data: UserCreate,
 @auth_router.post('/login',
                   summary="Login endpoint",
                   response_model=Token)
-async def login_user(user_data: UserCreate,
+async def login_user(user_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                      repo: UserRepository = Depends(get_user_repo)):
-    user = await auth_user(user_data, repo)
+    user = await auth_user(UserCreate(
+        username=user_data.username,
+        password=user_data.password),
+        repo
+    )
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Invalid username or password")
