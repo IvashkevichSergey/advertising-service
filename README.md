@@ -37,14 +37,11 @@ endpoint with body request:
 </blockquote>
 <code>To sign up with ADMIN role just uncomment <i>role</i> field in <i>app/auth/router.py</i> file</code>
 
-Then go to <code>/auth/login</code> endpoint to get access token with the same body request:
-<blockquote>{
-    <br>"username": "AnyUsername",
-    <br>"password": "123"
-<br>}
-</blockquote>
-The endpoint returns the access token. If you use Postman API platform you 
-should pass the token to Authorization header with Type: <code>Bearer token</code>
+Then go to <code>/auth/login</code> endpoint to get access token. You should use 
+`form-data` format to process your credentials. The endpoint returns the access token.
+
+If you use Postman API platform at any endpoint which require authorization 
+you should pass the token to Authorization header  with Type: <code>Bearer token</code>
 
 <h3>Docs</h3>
 Check full OpenAPI service documentation at <code>/docs</code> endpoint.
